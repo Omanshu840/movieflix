@@ -7,6 +7,18 @@ Your application is configured to deploy to GitHub Pages at:
 https://omanshu840.github.io/movieflix/
 ```
 
+### Public Directory Files
+
+The public directory includes optimized configuration files for your GitHub Pages deployment:
+
+- **manifest.json** - PWA configuration with app shortcuts and icons
+- **robots.txt** - SEO configuration for search engine crawlers
+- **sitemap.xml** - Sitemap for search engine indexing
+- **movieflix-icon.svg** - Application icon with gradient
+- **404.html** - Custom 404 handler for SPA routing
+- **favicon.png** - Favicon for browser tabs (add your own image)
+- **apple-touch-icon.png** - Icon for iOS home screen (add your own image)
+
 ### Deployment Methods
 
 #### Option 1: Automatic Deployment (Recommended)
@@ -41,6 +53,12 @@ This will:
 - ✅ Vite base path: `/movieflix/`
 - ✅ React Router basename: `/movieflix`
 - All routes and assets are correctly configured for this path
+
+**Favicon & Icon Files:**
+To complete the setup, add the following image files to the `public/` directory:
+- `favicon.png` (192x192 or 512x512 PNG)
+- `apple-touch-icon.png` (180x180 PNG for iOS)
+- `movieflix-og-image.png` (1200x630 PNG for social media preview)
 
 **Environment Variables:**
 Before deploying, ensure you have these set up:
