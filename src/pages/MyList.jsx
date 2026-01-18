@@ -232,7 +232,7 @@ const WatchlistCard = ({ content, onRemove }) => {
         {showOptions && (
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent flex flex-col items-center justify-center gap-3">
             <button
-              onClick={() => navigate(`/details/${content.id}?type=${content.media_type}`)}
+              onClick={() => navigate(`/${content.media_type}/${content.id}`)}
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white p-3 rounded-full transition-all hover:shadow-lg hover:shadow-purple-500/50"
             >
               <FiPlay className="w-5 h-5" />

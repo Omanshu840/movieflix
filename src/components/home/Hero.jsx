@@ -80,7 +80,7 @@ const Hero = ({ movie }) => {
   return (
     <div className="relative min-h-[85vh] h-screen">
       {/* Background Image - Right side */}
-      <div className="absolute inset-0 right-0 w-7/12 overflow-hidden">
+      <div className="absolute inset-0 right-0 overflow-hidden">
         <img
           src={backdropUrl}
           alt={movie.title || movie.name}

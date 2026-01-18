@@ -66,9 +66,7 @@ const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) =>
       await supabase
         .from('continue_watching')
         .upsert(upsertData, {
-          onConflict: mediaType === 'tv' 
-            ? 'user_id,tmdb_id,media_type,season,episode'
-            : 'user_id,tmdb_id,media_type'
+          onConflict: 'user_id,tmdb_id,media_type,season,episode'
         })
       
       console.log('Progress saved:', currentTime)
@@ -117,12 +115,17 @@ const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) =>
 
       {embedUrl && (
         <iframe
+          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
           src={embedUrl}
           className="w-full h-full"
           frameBorder="0"
           allowFullScreen
-          allow="autoplay; fullscreen"
+          allow="autoplay; fullscreen; encrypted-media"
+          playsInline
+          webkitallowfullscreen="true"
+          mozallowfullscreen="true"
         />
+        
       )}
     </div>
   )

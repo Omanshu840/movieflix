@@ -42,7 +42,7 @@ const ContinueWatchingCard = ({ item }) => {
 
   return (
     <div
-      className="min-w-[150px] md:min-w-[200px] cursor-pointer transition-all duration-300 hover:scale-110"
+      className="min-w-[150px] md:min-w-[200px] cursor-pointer transition-all duration-300"
       onClick={handleClick}
     >
       <div className="relative rounded-lg overflow-hidden bg-slate-800">

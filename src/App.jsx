@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import ScrollToTop from './components/utils/ScrollToTop'
 import Login from './components/auth/Login'
 import Home from './pages/Home'
 import Movies from './pages/Movies'
@@ -14,13 +15,32 @@ import Footer from './components/common/Footer'
 
 const ProtectedLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950">
-      <Sidebar />
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 flex flex-col">
+      {/* Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+      
+      {/* Header */}
       <Header />
-      <main className="ml-15 pb-12">
+      
+      {/* Main Content */}
+      <main className="hidden md:block md:ml-15 pb-20 md:pb-12 flex-1">
         {children}
       </main>
-      <Footer />
+      
+      {/* Main Content - Mobile */}
+      <main className="md:hidden pb-24 flex-1">
+        {children}
+      </main>
+      
+      {/* Footer - Hidden on mobile */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
+      
+      {/* Bottom Navigation - Mobile Only */}
+      <Sidebar />
     </div>
   )
 }
@@ -50,6 +70,7 @@ function App() {
   return (
     <AuthProvider>
       <Router basename="/movieflix">
+        <ScrollToTop />
         <Routes>
           {/* Public Route */}
           <Route

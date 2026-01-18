@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/movieflix/dev-sw.js?dev-sw', { scope: '/movieflix/', type: 'classic' })

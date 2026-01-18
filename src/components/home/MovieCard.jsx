@@ -4,7 +4,7 @@ import { FiPlay, FiPlus, FiCheck } from 'react-icons/fi'
 import { supabase } from '../../services/supabase'
 import { useAuth } from '../../context/AuthContext'
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, isHomePage=false }) => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [isInWatchlist, setIsInWatchlist] = useState(false)
@@ -76,7 +76,7 @@ const MovieCard = ({ movie }) => {
 
   return (
     <div
-      className="min-w-[150px] md:min-w-[200px] cursor-pointer transition-all duration-300 hover:scale-110 group"
+      className={`cursor-pointer group ${isHomePage ? 'min-w-[150px] md:min-w-[200px] ' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}

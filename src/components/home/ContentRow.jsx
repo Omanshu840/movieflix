@@ -102,7 +102,7 @@ const ContentRow = ({ title, fetchFunction, items, isContinueWatching = false })
           isContinueWatching ? (
             <ContinueWatchingCard key={item.id} item={item} />
           ) : (
-            <MovieCard key={item.id} movie={item} />
+            <MovieCard key={item.id} movie={item} isHomePage={true} />
           )
         )}
       </div>

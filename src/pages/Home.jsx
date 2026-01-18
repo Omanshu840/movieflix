@@ -38,7 +38,7 @@ const Home = () => {
       {heroMovie && <Hero movie={heroMovie} />}
 
       {/* Content Rows */}
-      <div className="relative z-10 -mt-32 space-y-12 pb-12 px-4 md:px-8">
+      <div className="relative z-10 mt-12 space-y-12 pb-12 px-4 md:px-8">
         {/* Continue Watching */}
         {!cwLoading && continueWatching.length > 0 && (
           <ContentRow

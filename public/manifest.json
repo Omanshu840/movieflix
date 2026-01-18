@@ -10,21 +10,21 @@
   "theme_color": "#7C3AED",
   "icons": [
     {
-      "src": "/movieflix-icon.svg",
+      "src": "/favicon.jpg",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "/movieflix-icon.svg",
+      "src": "/favicon.jpg",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
-      "src": "/movieflix-icon.svg",
+      "src": "/favicon.jpg",
       "sizes": "180x180",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any"
     }
   ],
@@ -45,9 +45,9 @@
       "url": "/movieflix/",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/favicon.jpg",
           "sizes": "192x192",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
     },
@@ -58,9 +58,9 @@
       "url": "/movieflix/movies",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/favicon.jpg",
           "sizes": "192x192",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
     },
@@ -71,9 +71,9 @@
       "url": "/movieflix/tv-shows",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/favicon.jpg",
           "sizes": "192x192",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
     },
@@ -84,9 +84,9 @@
       "url": "/movieflix/my-list",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/favicon.jpg",
           "sizes": "192x192",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
     }
