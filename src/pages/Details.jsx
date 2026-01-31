@@ -5,8 +5,14 @@ import { supabase } from "../services/supabase";
 import { useAuth } from "../context/AuthContext";
 import VideoPlayer from "../components/details/VideoPlayer";
 import SeasonSelector from "../components/details/SeasonSelector";
+import TrailerModal from "../components/details/TrailerModal";
 import Loader from "../components/common/Loader";
-import { FiPlay, FiPlus, FiCheck, FiX } from "react-icons/fi";
+import { FiPlay, FiPlus, FiCheck, FiX, FiFilm, FiTv, FiChevronDown } from "react-icons/fi";
+
+const sources = [
+  "videasy",
+  "vidking"
+]
 
 const Details = () => {
   const { mediaType, id } = useParams();
@@ -19,6 +25,10 @@ const Details = () => {
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [continueWatchingData, setContinueWatchingData] = useState(null);
+  const [trailerKey, setTrailerKey] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [selectedSource, setSelectedSource] = useState((localStorage.getItem('preferredSource')) || sources[0]);
+  const [isSourceDropdownOpen, setIsSourceDropdownOpen] = useState(false);
 
   const imageBaseUrl = "https://image.tmdb.org/t/p/original";
 
@@ -33,6 +43,14 @@ const Details = () => {
     try {
       const response = await getDetails(mediaType, id);
       setContent(response.data);
+      
+      // Extract trailer from videos
+      if (response.data.videos && response.data.videos.results) {
+        const trailer = response.data.videos.results.find(
+          (video) => video.type === "Trailer" && video.site === "YouTube"
+        );
+        setTrailerKey(trailer?.key || null);
+      }
     } catch (error) {
       console.error("Error fetching details:", error);
       setContent(null);
@@ -126,6 +144,12 @@ const Details = () => {
     // Refresh continue watching data after closing player
     loadContinueWatching();
   };
+
+  const handleSourceChange = (source) => {
+    setSelectedSource(source);
+    setIsSourceDropdownOpen(false);
+    localStorage.setItem('preferredSource', source);
+  }
 
   if (loading) {
     return <Loader />;
@@ -232,7 +256,7 @@ const Details = () => {
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 items-start">
                 <button
                   onClick={() => handlePlay()}
                   className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold px-8 py-3 rounded-full transition-all hover:shadow-lg hover:shadow-purple-500/50"
@@ -242,6 +266,16 @@ const Details = () => {
                     {continueWatchingData ? "Continue Watching" : "Play"}
                   </span>
                 </button>
+
+                {trailerKey && (
+                  <button
+                    onClick={() => setShowTrailer(true)}
+                    className="flex items-center space-x-2 bg-slate-700/40 hover:bg-slate-600/50 text-white font-bold px-8 py-3 rounded-full transition-all border border-slate-600/30 hover:border-blue-500/30"
+                  >
+                    <FiFilm className="w-5 h-5" />
+                    <span className="text-base">Watch Trailer</span>
+                  </button>
+                )}
 
                 <button
                   onClick={toggleWatchlist}
@@ -259,6 +293,40 @@ const Details = () => {
                     </>
                   )}
                 </button>
+
+                {/* Source Selector Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
+                    className="flex items-center space-x-2 bg-slate-700/40 hover:bg-slate-600/50 text-white font-bold px-8 py-3 rounded-full transition-all border border-slate-600/30 hover:border-blue-500/30"
+                  >
+                    <FiTv className="w-5 h-5" />
+                    <span className="text-base">{selectedSource}</span>
+                    <FiChevronDown className={`w-4 h-4 transition-transform ${isSourceDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isSourceDropdownOpen && (
+                    <div className="absolute top-full mt-2 bg-slate-800 rounded-lg shadow-lg border border-slate-700 overflow-hidden z-50">
+                      {sources.map((source, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSourceChange(source)}
+                            className={`w-full px-4 py-2 text-left text-sm transition-colors flex items-center gap-2 ${
+                              selectedSource === source
+                                ? 'bg-blue-500/20 text-blue-400 font-semibold'
+                                : 'text-gray-300 hover:bg-slate-700'
+                            }`}
+                          >
+                            <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center">
+                              {selectedSource === source && <span className="w-2 h-2 bg-current rounded-full" />}
+                            </span>
+                            {source}
+                          </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -291,9 +359,18 @@ const Details = () => {
           mediaType={mediaType}
           season={selectedSeason}
           episode={selectedEpisode}
+          source={selectedSource}
           onClose={handleClosePlayer}
         />
       )}
+
+      {/* Trailer Modal */}
+      <TrailerModal
+        isOpen={showTrailer}
+        onClose={() => setShowTrailer(false)}
+        videoKey={trailerKey}
+        title={content?.title || content?.name}
+      />
     </>
   );
 };

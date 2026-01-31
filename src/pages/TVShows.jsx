@@ -50,15 +50,15 @@ const TVShows = () => {
       let response
 
       if (selectedGenre) {
-        response = await discoverByGenre('tv', selectedGenre)
+        response = await discoverByGenre('tv', selectedGenre, pageNum)
       } else if (selectedCategory === 'popular') {
-        response = await getPopular('tv')
+        response = await getPopular('tv', pageNum)
       } else if (selectedCategory === 'top_rated') {
-        response = await getTopRated('tv')
+        response = await getTopRated('tv', pageNum)
       } else {
         const category = categories.find((cat) => cat.id === selectedCategory)
         if (category?.genreId) {
-          response = await discoverByGenre('tv', category.genreId)
+          response = await discoverByGenre('tv', category.genreId, pageNum)
         }
       }
 

@@ -50,15 +50,15 @@ const Movies = () => {
       let response
 
       if (selectedGenre) {
-        response = await discoverByGenre('movie', selectedGenre)
+        response = await discoverByGenre('movie', selectedGenre, pageNum)
       } else if (selectedCategory === 'popular') {
-        response = await getPopular('movie')
+        response = await getPopular('movie', pageNum)
       } else if (selectedCategory === 'top_rated') {
-        response = await getTopRated('movie')
+        response = await getTopRated('movie', pageNum)
       } else {
         const category = categories.find((cat) => cat.id === selectedCategory)
         if (category?.genreId) {
-          response = await discoverByGenre('movie', category.genreId)
+          response = await discoverByGenre('movie', category.genreId, pageNum)
         }
       }
 

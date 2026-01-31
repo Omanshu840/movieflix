@@ -4,22 +4,74 @@ import { supabase } from '../../services/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { FiX } from 'react-icons/fi'
 
-const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) => {
+const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose, source}) => {
   const [embedUrl, setEmbedUrl] = useState('')
+  const [savedProgress, setSavedProgress] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const iframeRef = useRef(null)
   const { user } = useAuth()
   const lastSaveTimeRef = useRef(0)
-  const SAVE_INTERVAL = 5 * 60 // 5 minutes in seconds
+  const SAVE_INTERVAL = 1 * 60// 5 minutes in seconds
 
+  // Fetch saved progress on component mount or when content changes
   useEffect(() => {
-    // Generate embed URL without saved progress - VidKing handles it
-    const url = getEmbedUrl(tmdbId, mediaType, season, episode, {
-      color: 'e50914',
+    const fetchSavedProgress = async () => {
+      if (!user) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        let query = supabase
+          .from('continue_watching')
+          .select('progress')
+          .eq('user_id', user.id)
+          .eq('tmdb_id', tmdbId)
+          .eq('media_type', mediaType)
+
+        if (mediaType === 'tv') {
+          query = query.eq('season', season).eq('episode', episode)
+        }
+
+        const { data, error } = await query.single()
+
+        if (!error && data) {
+          setSavedProgress(data.progress)
+        } else {
+          setSavedProgress(null)
+        }
+      } catch (error) {
+        console.error('Error fetching saved progress:', error)
+        setSavedProgress(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSavedProgress()
+    console.log('Fetching saved progress for:', { tmdbId, mediaType, season, episode });
+  }, [tmdbId, mediaType, season, episode, user])
+
+  // Generate embed URL
+  useEffect(() => {
+    if (isLoading) return
+
+    const url = getEmbedUrl(tmdbId, mediaType, source, season, episode, {
+      color: '7C3AED',
       autoPlay: true,
       nextEpisode: mediaType === 'tv',
       episodeSelector: mediaType === 'tv',
+      progress: savedProgress
     })
     setEmbedUrl(url)
-  }, [tmdbId, mediaType, season, episode])
+    console.log('Generated embed URL:', url);
+
+    // Set progress in lastSaveTimeRef if available
+    if (savedProgress !== null) {
+      lastSaveTimeRef.current = savedProgress
+    }
+  }, [tmdbId, mediaType, season, episode, source, savedProgress, isLoading])
+
 
   useEffect(() => {
     const cleanup = setupPlayerListener(async (eventData) => {
@@ -53,6 +105,8 @@ const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) =>
       user_id: user.id,
       tmdb_id: tmdbId,
       media_type: mediaType,
+      season: 0,
+      episode: 0,
       progress: currentTime,
       updated_at: new Date().toISOString(),
     }
@@ -113,9 +167,17 @@ const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) =>
         <FiX className="w-6 h-6" />
       </button>
 
-      {embedUrl && (
-        <iframe
-          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+      {isLoading && (
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+        </div>
+      )}
+
+      {(!isLoading && embedUrl) && (
+        (source === 'videasy') ? (
+          <iframe
+          ref={iframeRef}
+          // sandbox="allow-scripts"
           src={embedUrl}
           className="w-full h-full"
           frameBorder="0"
@@ -125,7 +187,20 @@ const VideoPlayer = ({ tmdbId, mediaType, season = 1, episode = 1, onClose }) =>
           webkitallowfullscreen="true"
           mozallowfullscreen="true"
         />
-        
+        ) : (
+        <iframe
+          ref={iframeRef}
+          sandbox={"allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation"}
+          src={embedUrl}
+          className="w-full h-full"
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; fullscreen; encrypted-media"
+          playsInline
+          webkitallowfullscreen="true"
+          mozallowfullscreen="true"
+        />
+        )
       )}
     </div>
   )

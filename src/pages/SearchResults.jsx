@@ -36,7 +36,7 @@ const SearchResults = () => {
     setLoading(true)
     try {
       const currentFilter = filters.find(f => f.id === selectedFilter)
-      const response = await search(query, currentFilter.type)
+      const response = await search(query, currentFilter.type, pageNum)
       
       if (pageNum === 1) {
         setResults(response.data.results || [])

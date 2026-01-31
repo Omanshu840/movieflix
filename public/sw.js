@@ -60,6 +60,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (url.hostname.includes('tmdb-proxy.tmdb-proxy-movieflix.workers.dev')) {
+    event.respondWith(staleWhileRevalidate(request));
+    return;
+  }
+
   // Handle API requests
   if (url.pathname.includes('/api/') || 
       url.hostname.includes('api.themoviedb.org') ||
@@ -89,6 +94,68 @@ self.addEventListener('fetch', (event) => {
   // Default strategy
   event.respondWith(networkFirstStrategy(request));
 });
+
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(API_CACHE);
+  const cachedResponse = await cache.match(request);
+
+  const now = Date.now();
+  const ttl = getApiTTL();
+
+  // If cache exists → return immediately
+  if (cachedResponse) {
+    // Revalidate in background if stale
+    const cachedTime = cachedResponse.headers.get('sw-cache-time');
+    const age = cachedTime ? now - Number(cachedTime) : Infinity;
+
+    if (age > ttl) {
+      // Background refresh (does NOT block UI)
+      self.registration.sync
+        ? self.registration.sync.register('swr-refresh')
+        : refreshCache(request);
+    }
+
+    return cachedResponse;
+  }
+
+  // No cache → fetch normally
+  const networkResponse = await fetchAndCache(request);
+  return networkResponse;
+}
+
+async function fetchAndCache(request) {
+  const cache = await caches.open(API_CACHE);
+  const response = await fetch(request);
+
+  if (response && response.status === 200) {
+    const headers = new Headers(response.headers);
+    headers.set('sw-cache-time', Date.now().toString());
+
+    const cachedResponse = new Response(await response.clone().blob(), {
+      status: response.status,
+      statusText: response.statusText,
+      headers
+    });
+
+    await cache.put(request, cachedResponse);
+  }
+
+  return response;
+}
+
+async function refreshCache(request) {
+  try {
+    await fetchAndCache(request);
+  } catch (err) {
+    // Silent failure (offline, etc.)
+  }
+}
+
+function getApiTTL() {
+  return 24 * 60 * 60 * 1000;
+}
+
 
 /**
  * Network First Strategy

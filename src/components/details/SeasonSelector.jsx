@@ -3,6 +3,7 @@ import axios from 'axios'
 import { supabase } from '../../services/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { FiPlay } from 'react-icons/fi'
+import { getEpisodes } from '../../services/tmdbApi'
 
 const SeasonSelector = ({
   seasons,
@@ -29,14 +30,7 @@ const SeasonSelector = ({
   const fetchEpisodes = async (seasonNumber) => {
     setLoading(true)
     try {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}`,
-        {
-          params: {
-            api_key: API_KEY,
-          },
-        }
-      )
+      const response = await getEpisodes(tmdbId, seasonNumber);
       setEpisodes(response.data.episodes || [])
     } catch (error) {
       console.error('Error fetching episodes:', error)

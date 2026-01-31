@@ -3,7 +3,8 @@
  * Generate embed URLs for movies and TV shows
  */
 
-const BASE_URL = 'https://www.vidking.net/embed'
+const VIDKING_BASE_URL = 'https://www.vidking.net/embed'
+const VIDEASY_BASE_URL = 'https://player.videasy.net'
 
 /**
  * Generate VidKing embed URL
@@ -14,7 +15,7 @@ const BASE_URL = 'https://www.vidking.net/embed'
  * @param {object} options - Additional options
  * @returns {string} Embed URL
  */
-export const getEmbedUrl = (tmdbId, mediaType, season = null, episode = null, options = {}) => {
+export const getEmbedUrl = (tmdbId, mediaType, source, season = null, episode = null, options = {}, ) => {
   const {
     color = 'e50914', // Netflix red
     autoPlay = true,
@@ -24,6 +25,18 @@ export const getEmbedUrl = (tmdbId, mediaType, season = null, episode = null, op
   } = options
 
   let url = ''
+
+  let BASE_URL = "";
+  switch(source) {
+    case "vidking":
+      BASE_URL = VIDKING_BASE_URL;
+      break;
+    case "videasy":
+      BASE_URL = VIDEASY_BASE_URL;
+      break;
+    default:
+      BASE_URL = VIDEASY_BASE_URL;
+  }
 
   if (mediaType === 'movie') {
     url = `${BASE_URL}/movie/${tmdbId}`
@@ -41,11 +54,14 @@ export const getEmbedUrl = (tmdbId, mediaType, season = null, episode = null, op
   if (mediaType === 'tv') {
     params.append('nextEpisode', nextEpisode)
     params.append('episodeSelector', episodeSelector)
+    params.append('autoplayNextEpisode', true)
   }
 
-  if (progress !== null) {
+  if (progress !== null && source === "videasy") {
     params.append('progress', progress)
   }
+
+  params.append('overlay', true);
 
   return `${url}?${params.toString()}`
 }
